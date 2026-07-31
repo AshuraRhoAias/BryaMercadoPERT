@@ -5,19 +5,64 @@ independientes descritas en las secciones 4.5 y 4.6 del informe (`Entrega/Inform
 No son capturas de pantalla ni resultados escritos a mano: son los archivos que se ejecutaron
 y las salidas que produjeron, tal cual, para que cualquiera pueda reproducirlos.
 
-## Orden de ejecución
+## Ejecutar todo con un solo comando
+
+No hace falta escribir cada paso a mano. Ya viene armado un script que hace las 5
+verificaciones seguidas, sin intervención manual, y avisa (sin detenerse) si algún
+programa no está instalado.
+
+**Windows** — doble clic sobre `ejecutar_todo.bat` (o, en PowerShell, parado en esta carpeta):
+
+```powershell
+.\ejecutar_todo.ps1
+```
+
+**Linux / macOS**, parado en esta carpeta:
+
+```bash
+chmod +x ejecutar_todo.sh
+./ejecutar_todo.sh
+```
+
+Requisitos previos (una sola vez): tener instalados **Python 3**, **LibreOffice** y, opcionalmente,
+**lp_solve** (línea de comandos, no la "LPSolve IDE" gráfica, ver nota más abajo). El script
+instala solo `openpyxl` y `scipy` vía pip; lo demás debe estar ya instalado en el sistema.
+
+Al terminar, la consola muestra las 5 corridas una tras otra; todas deberían coincidir en el
+mismo costo óptimo: **Z = 4 170**.
+
+### Nota para Windows: "LPSolve IDE" no es lo mismo que "lp_solve"
+
+Si instalaste **LPSolve IDE** (un programa gráfico de terceros), el ejecutable que trae es
+`LpSolveIDE.exe`, no `lp_solve.exe`. El comando de línea de comandos que usa este proyecto
+(`lp_solve -S4 modelo.lp`) necesita el paquete de **consola** de lp_solve, que es un `.zip`
+distinto: descarga `lp_solve_5.5.x_exe_win64.zip` desde
+<https://sourceforge.net/projects/lpsolve/files/lpsolve/>, descomprímelo, y agrega esa carpeta
+(la que contiene `lp_solve.exe`) al PATH de Windows. Si no lo instalas, el script simplemente
+se salta ese paso y sigue con los demás; el modelo igual queda verificado por las otras 4 vías.
+
+### Nota técnica: por qué hay que usar el Python de LibreOffice para `run_solver.py`
+
+`run_solver.py` y `fill_solution.py` usan el módulo `uno` para controlar LibreOffice Calc,
+y ese módulo solo existe dentro del propio Python que trae LibreOffice instalado
+(`C:\Program Files\LibreOffice\program\python.exe` en Windows), no en un Python normal
+instalado aparte. El script `ejecutar_todo.ps1` ya detecta esa ruta automáticamente y usa el
+Python correcto para esos dos pasos, y el Python del sistema para el resto (`build_xlsx.py` y
+`verify_scipy.py`, que no necesitan `uno`).
+
+## Qué hace cada paso (por si se quiere correr uno por uno)
 
 1. **`build_xlsx.py`** — genera `Modelo_Transporte_Solver.xlsx` (en `Entrega/`) con la
    estructura de celdas, restricciones y celda objetivo tal como se configuraría en Excel
    Solver. Salida: `salida_build_xlsx.txt`.
 2. **`run_solver.py`** — abre ese archivo con LibreOffice Calc (vía UNO/Python) y ejecuta
    su Solver integrado (motor `lp_solve`). Requiere que LibreOffice esté escuchando en el
-   puerto 2002 (ver comando al inicio del propio script). Salida real:
-   `salida_run_solver.txt` → `Success: True`, `ResultValue: 4170.0`.
-3. **`fill_solution.py`** — carga la solución óptima (obtenida a mano en las secciones 4.2–4.4)
-   en las celdas de variables del mismo archivo, para dejarlo en el estado "resuelto" que se
-   ve en la captura del informe. Salida: `salida_fill_solution.txt` → objetivo recalculado
-   = 4170.0.
+   puerto 2002 (el script `ejecutar_todo` ya se encarga de levantarlo y esperarlo). Salida
+   real: `salida_run_solver.txt` → `Success: True`, `ResultValue: 4170.0`.
+3. **`fill_solution.py`** — carga la solución óptima (obtenida a mano en las secciones 4.2–4.4
+   del informe) en las celdas de variables del mismo archivo, para dejarlo en el estado
+   "resuelto" que se ve en la captura del informe. Salida: `salida_fill_solution.txt` →
+   objetivo recalculado = 4170.0.
 4. **`modelo.lp`** — el mismo modelo, pero escrito directamente en el formato de texto de
    `lp_solve`, resuelto por línea de comandos (`lp_solve -S4 modelo.lp`), sin pasar por
    ninguna hoja de cálculo. Salida real: `salida_lp_solve.txt` → función objetivo 4170.00000000,
@@ -28,7 +73,7 @@ y las salidas que produjeron, tal cual, para que cualquiera pueda reproducirlos.
    `salida_verify_scipy.txt` → objetivo 4170.0, con una tercera asignación de rutas distinta
    a las dos anteriores.
 
-## Cómo reproducirlo
+## Reproducir un paso suelto a mano (Linux/macOS)
 
 ```bash
 pip install openpyxl scipy
