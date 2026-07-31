@@ -1,0 +1,73 @@
+
+Value of objective function: 4170.00000000
+
+Actual values of the variables:
+XA1                             0
+XA2                             0
+XA3                             0
+XA4                             0
+XA5                           100
+XB1                             0
+XB2                             0
+XB3                            90
+XB4                            60
+XB5                             0
+XC1                            80
+XC2                            90
+XC3                            30
+XC4                             0
+XC5                             0
+
+Actual values of the constraints:
+OFERTA_A                      100
+OFERTA_B                      150
+OFERTA_C                      200
+DEM_1                          80
+DEM_2                          90
+DEM_3                         120
+DEM_4                          60
+DEM_5                         100
+
+Objective function limits:
+                                 From            Till       FromValue
+XA1                            -1e+30               4               0
+XA2                            -1e+30               6               0
+XA3                            -1e+30               8               0
+XA4                                10           1e+30          -1e+30
+XA5                            -1e+30              12          -1e+30
+XB1                                 5           1e+30              80
+XB2                            -1e+30               7              90
+XB3                                 9               9          -1e+30
+XB4                                11              11          -1e+30
+XB5                                13           1e+30               0
+XC1                            -1e+30               6          -1e+30
+XC2                            -1e+30               8          -1e+30
+XC3                                10              10          -1e+30
+XC4                                12           1e+30              30
+XC5                                14           1e+30               0
+
+Dual values with from - till limits:
+                           Dual value            From            Till
+OFERTA_A                           -2             100             130
+OFERTA_B                           -1             150             180
+OFERTA_C                            0          -1e+30           1e+30
+DEM_1                               6               0              80
+DEM_2                               8               0              90
+DEM_3                              10              90             120
+DEM_4                              12              30              60
+DEM_5                              14              70             100
+XA1                                 0             -30               0
+XA2                                 0             -30               0
+XA3                                 0             -60               0
+XA4                                 0          -1e+30           1e+30
+XA5                                 0          -1e+30           1e+30
+XB1                                 0             -30              80
+XB2                                 0             -30              90
+XB3                                 0          -1e+30           1e+30
+XB4                                 0          -1e+30           1e+30
+XB5                                 0               0              60
+XC1                                 0          -1e+30           1e+30
+XC2                                 0          -1e+30           1e+30
+XC3                                 0          -1e+30           1e+30
+XC4                                 0             -90              30
+XC5                                 0               0              30

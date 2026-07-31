@@ -1,0 +1,2 @@
+Objetivo tras cargar la solucion: 4170.0
+Guardado: Modelo_Transporte_Solver.xlsx

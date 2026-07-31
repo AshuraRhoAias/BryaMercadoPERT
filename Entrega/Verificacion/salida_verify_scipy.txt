@@ -1,0 +1,8 @@
+Status: 0 Optimization terminated successfully. (HiGHS Status 7: Optimal)
+Objetivo (Z): 4170.0
+XA2 = 40.0
+XA4 = 60.0
+XB2 = 50.0
+XB5 = 100.0
+XC1 = 80.0
+XC3 = 120.0

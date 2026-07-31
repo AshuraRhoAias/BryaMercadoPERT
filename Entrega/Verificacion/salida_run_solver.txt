@@ -1,0 +1,5 @@
+Success: True
+ResultValue: 4170.0
+Solved decision variables (from sheet cells): [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+Objective cell value (from sheet): 0.0
+done
