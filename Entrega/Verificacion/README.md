@@ -7,9 +7,10 @@ y las salidas que produjeron, tal cual, para que cualquiera pueda reproducirlos.
 
 ## Ejecutar todo con un solo comando
 
-No hace falta escribir cada paso a mano. Ya viene armado un script que hace las 5
-verificaciones seguidas, sin intervención manual, y avisa (sin detenerse) si algún
-programa no está instalado.
+No hace falta escribir cada paso a mano. Ya viene armado un script que hace todas las
+verificaciones seguidas, sin intervención manual (en Windows, incluso abre LPSolve IDE
+solo, con el modelo ya cargado), y avisa (sin detenerse) si algún programa no está
+instalado.
 
 **Windows** — doble clic sobre `ejecutar_todo.bat` (o, en PowerShell, parado en esta carpeta):
 
@@ -28,8 +29,8 @@ Requisitos previos (una sola vez): tener instalados **Python 3**, **LibreOffice*
 **lp_solve** (línea de comandos, no la "LPSolve IDE" gráfica, ver nota más abajo). El script
 instala solo `openpyxl` y `scipy` vía pip; lo demás debe estar ya instalado en el sistema.
 
-Al terminar, la consola muestra las 5 corridas una tras otra; todas deberían coincidir en el
-mismo costo óptimo: **Z = 4 170**.
+Al terminar, la consola muestra todas las corridas una tras otra; todas deberían coincidir en
+el mismo costo óptimo: **Z = 4 170**.
 
 ### Nota para Windows: "LPSolve IDE" no es lo mismo que "lp_solve"
 
@@ -39,7 +40,16 @@ Si instalaste **LPSolve IDE** (un programa gráfico de terceros), el ejecutable 
 distinto: descarga `lp_solve_5.5.x_exe_win64.zip` desde
 <https://sourceforge.net/projects/lpsolve/files/lpsolve/>, descomprímelo, y agrega esa carpeta
 (la que contiene `lp_solve.exe`) al PATH de Windows. Si no lo instalas, el script simplemente
-se salta ese paso y sigue con los demás; el modelo igual queda verificado por las otras 4 vías.
+se salta ese paso y sigue con los demás; el modelo igual queda verificado por las otras vías.
+
+Aun así, si `ejecutar_todo.ps1` encuentra **LPSolve IDE** instalado en una de sus rutas
+habituales (`C:\Program Files (x86)\LPSolve IDE\LpSolveIDE.exe` o `C:\Program Files\...`), lo
+abre automáticamente con `modelo.lp` ya cargado y le manda la tecla F9 para intentar resolverlo
+en la propia interfaz, como confirmación visual extra. Este paso es "mejor esfuerzo": si el
+atajo de esa versión del IDE no es F9, la ventana igual queda abierta con el modelo cargado
+(se resuelve con un clic en Model → Solve), y de todos modos el resultado numérico ya quedó
+comprobado por los pasos anteriores (LibreOffice Solver, lp_solve y SciPy), así que no depende
+de que esta automatización funcione al 100 %.
 
 ### Nota técnica: por qué hay que usar el Python de LibreOffice para `run_solver.py`
 
@@ -68,7 +78,12 @@ Python correcto para esos dos pasos, y el Python del sistema para el resto (`bui
    ninguna hoja de cálculo. Salida real: `salida_lp_solve.txt` → función objetivo 4170.00000000,
    con una asignación de rutas distinta a la de la esquina noroeste (evidencia real de que el
    problema tiene más de una solución óptima) y los precios duales de cada restricción.
-5. **`verify_scipy.py`** — el mismo modelo, resuelto en Python con `scipy.optimize.linprog`
+5. **LPSolve IDE** (solo Windows, solo si está instalado) — el script lo abre con `modelo.lp`
+   ya cargado y le manda la tecla F9, como confirmación visual adicional. Es un paso "mejor
+   esfuerzo" (no todos los atajos de teclado son iguales en todas las versiones) y no es
+   necesario para validar el modelo: eso ya lo hacen los pasos 2 y 4 (LibreOffice Solver y
+   lp_solve por línea de comandos).
+6. **`verify_scipy.py`** — el mismo modelo, resuelto en Python con `scipy.optimize.linprog`
    (motor HiGHS), independiente de LibreOffice y de lp_solve. Salida real:
    `salida_verify_scipy.txt` → objetivo 4170.0, con una tercera asignación de rutas distinta
    a las dos anteriores.

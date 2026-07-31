@@ -1,14 +1,15 @@
-# Ejecuta, sin intervencion manual, las 5 pruebas de verificacion del modelo
-# de transporte descritas en el README.md e informe.
+# Ejecuta, sin intervencion manual, las pruebas de verificacion del modelo
+# de transporte descritas en el README.md e informe (incluye abrir LPSolve
+# IDE con el modelo ya cargado, si esta instalado).
 #
 # Uso (PowerShell, parado en esta carpeta):
 #   .\ejecutar_todo.ps1
 # o, mas facil todavia, doble clic sobre ejecutar_todo.bat.
 #
-# El script busca solo Python y LibreOffice, levanta LibreOffice en modo
-# servidor, corre las 5 verificaciones en orden y al final apaga LibreOffice.
-# Si algo no esta instalado (LibreOffice o lp_solve), lo avisa y sigue con
-# lo que si puede ejecutar, en vez de detenerse.
+# El script busca Python, LibreOffice y LPSolve IDE, levanta LibreOffice en
+# modo servidor, corre las verificaciones en orden y al final apaga
+# LibreOffice. Si algo no esta instalado (LibreOffice, lp_solve o LPSolve
+# IDE), lo avisa y sigue con lo que si puede ejecutar, en vez de detenerse.
 
 $ErrorActionPreference = "Continue"
 $here = Split-Path -Parent $MyInvocation.MyCommand.Path
@@ -42,11 +43,11 @@ if ($sofficeExe) {
     if (Test-Path $candidato) { $loPython = $candidato }
 }
 
-Write-Section "0/5 Preparando dependencias de Python (openpyxl, scipy)"
+Write-Section "0/6 Preparando dependencias de Python (openpyxl, scipy)"
 & $sysPython -m pip install -q openpyxl scipy
 
 # ---------- 1) construir la hoja de calculo ----------
-Write-Section "1/5 Construyendo la hoja de calculo con la estructura de Solver (build_xlsx.py)"
+Write-Section "1/6 Construyendo la hoja de calculo con la estructura de Solver (build_xlsx.py)"
 & $sysPython build_xlsx.py
 
 # ---------- 2-3) LibreOffice Calc Solver ----------
@@ -67,10 +68,10 @@ if ($sofficeExe -and $loPython) {
     }
 
     if ($listo) {
-        Write-Section "2/5 Resolviendo con el Solver de LibreOffice Calc, motor lp_solve (run_solver.py)"
+        Write-Section "2/6 Resolviendo con el Solver de LibreOffice Calc, motor lp_solve (run_solver.py)"
         & $loPython run_solver.py
 
-        Write-Section "3/5 Cargando la solucion optima en la hoja (fill_solution.py)"
+        Write-Section "3/6 Cargando la solucion optima en la hoja (fill_solution.py)"
         & $loPython fill_solution.py
     } else {
         Write-Warn "LibreOffice no respondio a tiempo en el puerto 2002; se omiten los pasos 2 y 3."
@@ -84,7 +85,7 @@ if ($sofficeExe -and $loPython) {
 }
 
 # ---------- 4) lp_solve por linea de comandos ----------
-Write-Section "4/5 Verificando con lp_solve por linea de comandos (modelo.lp)"
+Write-Section "4/6 Verificando con lp_solve por linea de comandos (modelo.lp)"
 $lpSolveExe = (Get-Command lp_solve.exe -ErrorAction SilentlyContinue).Source
 if (-not $lpSolveExe) { $lpSolveExe = (Get-Command lp_solve -ErrorAction SilentlyContinue).Source }
 if ($lpSolveExe) {
@@ -96,8 +97,34 @@ if ($lpSolveExe) {
     Write-Warn "https://sourceforge.net/projects/lpsolve/files/lpsolve/ y agrega esa carpeta al PATH."
 }
 
-# ---------- 5) Python + SciPy ----------
-Write-Section "5/5 Verificando con Python + SciPy, motor HiGHS (verify_scipy.py)"
+# ---------- 5) LPSolve IDE (paso visual, no obligatorio) ----------
+Write-Section "5/6 Abriendo LPSolve IDE con el modelo cargado (paso visual)"
+$lpIdeCandidates = @(
+    "C:\Program Files (x86)\LPSolve IDE\LpSolveIDE.exe",
+    "C:\Program Files\LPSolve IDE\LpSolveIDE.exe"
+)
+$lpIde = $lpIdeCandidates | Where-Object { Test-Path $_ } | Select-Object -First 1
+if ($lpIde) {
+    try {
+        $modeloPath = Join-Path $here "modelo.lp"
+        Start-Process -FilePath $lpIde -ArgumentList "`"$modeloPath`"" | Out-Null
+        Start-Sleep -Seconds 3
+        # Intento automatico de resolver dentro del IDE (mejor esfuerzo: el atajo
+        # exacto puede variar segun la version). El resultado numerico ya quedo
+        # comprobado arriba con lp_solve/LibreOffice/SciPy, asi que si esto no
+        # funciona en tu version, no afecta la validacion del modelo.
+        Add-Type -AssemblyName System.Windows.Forms
+        [System.Windows.Forms.SendKeys]::SendWait("{F9}")
+        Write-Host "LPSolve IDE abierto con modelo.lp cargado."
+    } catch {
+        Write-Warn "Se abrio LPSolve IDE pero no se pudo automatizar el 'Resolver'. Puedes hacerlo manualmente desde el menu Model/Solve."
+    }
+} else {
+    Write-Warn "No se encontro LPSolve IDE en las rutas habituales; se omite este paso (es solo visual, no afecta la validacion ya hecha arriba)."
+}
+
+# ---------- 6) Python + SciPy ----------
+Write-Section "6/6 Verificando con Python + SciPy, motor HiGHS (verify_scipy.py)"
 & $sysPython verify_scipy.py
 
 Write-Section "Listo"
